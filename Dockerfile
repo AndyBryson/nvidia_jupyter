@@ -50,6 +50,8 @@ RUN eval "$(conda shell.bash hook)" && \
     ipython kernel install --name "xeus-python" --user && \
     conda activate base
 
+RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
+
 EXPOSE 8888
 
 # Setup work directory for backward-compatibility
