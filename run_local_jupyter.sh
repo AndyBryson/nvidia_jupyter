@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker build -t jupyter . && \
+# docker build -t jupyter . && \
 docker image build --tag brys/jupyter . && \
 (docker rm -f jupyter | exit 0) && \
 
