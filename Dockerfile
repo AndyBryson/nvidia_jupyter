@@ -39,7 +39,7 @@ RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
 RUN fix-permissions "${HOME}" && \
     fix-permissions "${CONDA_DIR}"
 
-ARG install_packages="ipywidgets nodejs numpy pandas dask[dataframe,distributed] pyproj netcdf4 basemap ipympl seaborn"
+ARG install_packages="ipywidgets nodejs numpy pandas dask[dataframe,distributed] pyproj netcdf4 basemap ipympl seaborn geopandas xarray cfgrib sympy"
 
 RUN mamba install -y -c conda-forge ${install_packages}
 
