@@ -4,8 +4,6 @@ RUN apt-get update
 RUN apt-get install -y tini sudo locales
 RUN echo "en_GB.UTF-8 UTF-8" > /etc/locale.gen && locale-gen
 
-RUN conda install -y -c conda-forge mamba
-
 ARG NB_USER="jovyan"
 ARG NB_UID="1000"
 ARG NB_GID="100"
@@ -39,26 +37,33 @@ RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
 RUN fix-permissions "${HOME}" && \
     fix-permissions "${CONDA_DIR}"
 
-ARG install_packages="ipywidgets nodejs numpy pandas dask[dataframe,distributed] pyproj netcdf4 basemap ipympl seaborn geopandas xarray cfgrib sympy"
+USER ${NB_UID}
 
-RUN mamba install -y -c conda-forge ${install_packages}
+# Setup work directory for backward-compatibility
+RUN mkdir "/home/${NB_USER}/work" && \
+    fix-permissions "/home/${NB_USER}" && ln -s "/home/${NB_USER}/work" /workspace/work
+
+RUN conda update --all
+RUN conda install -y -c conda-forge mamba jupyterlab
+
+ARG conda_packages="ipywidgets nodejs numpy pandas dask[dataframe,distributed] pyproj \
+                    netcdf4 basemap ipympl seaborn geopandas xarray cfgrib sympy"
+
+ARG plotly_packages="plotly plotly_express"
+
+RUN mamba install -y -c conda-forge ${conda_packages} && mamba install -y -c plotly ${plotly_packages}
 
 RUN eval "$(conda shell.bash hook)" && \
     mamba create -n xeus-python && \
     conda activate xeus-python && \
-    mamba install -y -c conda-forge xeus-python jupyter ${install_packages} && \
+    mamba install -y -c conda-forge xeus-python jupyter ${conda_packages} && \
+    mamba install -y -c plotly ${plotly_packages} && \
     ipython kernel install --name "xeus-python" --user && \
     conda activate base
 
 RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
 
 EXPOSE 8888
-
-# Setup work directory for backward-compatibility
-RUN mkdir "/home/${NB_USER}/work" && \
-    fix-permissions "/home/${NB_USER}" && ln -s "/home/${NB_USER}/work" /workspace/work
-
-USER ${NB_UID}
 
 # Configure container startup
 ENTRYPOINT ["tini", "-g", "--"]
