@@ -48,7 +48,7 @@ RUN conda install -y -c conda-forge mamba jupyterlab
 
 ARG conda_packages="ipywidgets nodejs numpy pandas dask[dataframe,distributed] pyproj \
                     netcdf4 basemap ipympl seaborn geopandas xarray cfgrib sympy mongoengine \
-                    openpyxl"
+                    openpyxl loguru pint"
 
 ARG plotly_packages="plotly plotly_express"
 
