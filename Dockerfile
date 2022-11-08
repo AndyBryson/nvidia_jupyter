@@ -55,11 +55,19 @@ ARG plotly_packages="plotly plotly_express"
 RUN mamba install -y -c conda-forge ${conda_packages} && mamba install -y -c plotly ${plotly_packages}
 
 RUN eval "$(conda shell.bash hook)" && \
-    mamba create -n xeus-python && \
+    mamba create -n xeus-python python=3.10  && \
     conda activate xeus-python && \
     mamba install -y -c conda-forge xeus-python jupyter ${conda_packages} && \
     mamba install -y -c plotly ${plotly_packages} && \
-    ipython kernel install --name "xeus-python" --user && \
+    ipython kernel install --name "xeus-python" --user --display-name "Python 3.10 (xeus-python)" && \
+    conda activate base
+
+RUN eval "$(conda shell.bash hook)" && \
+    mamba create -n three_ten python=3.10 && \
+    conda activate three_ten && \
+    mamba install -y -c conda-forge jupyter ${conda_packages} && \
+    mamba install -y -c plotly ${plotly_packages} && \
+    ipython kernel install --name "three_ten" --user --display-name "Python 3.10 (three_ten)" && \
     conda activate base
 
 RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
